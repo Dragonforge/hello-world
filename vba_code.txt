@@ -1,0 +1,157 @@
+Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    Call Module5.DeleteShortcut
+    
+End Sub
+
+Private Sub Workbook_Open()
+    Call Module5.CreateShortcut
+    
+End Sub
+
+================================================================================
+
+Option Explicit
+
+Sub RemoveEmptyLines()
+    
+    On Error Resume Next
+    Sheets("Words").Columns("A").SpecialCells(xlCellTypeBlanks).EntireRow.Delete
+    On Error Resume Next
+    Sheets("Known").Columns("A").SpecialCells(xlCellTypeBlanks).EntireRow.Delete
+
+End Sub
+
+Sub ChangeFont()
+
+    Sheets("Words").Cells.Font.Size = 20
+    Sheets("Words").Cells.Font.Name = "Yu Gothic"
+    Sheets("Known").Cells.Font.Size = 20
+    Sheets("Known").Cells.Font.Name = "Yu Gothic"
+    Sheets("Words").Columns(1).ColumnWidth = 25
+    Sheets("Words").Columns(2).ColumnWidth = 25
+    Sheets("Words").Columns(3).ColumnWidth = 25
+    Sheets("Known").Columns(2).ColumnWidth = 25
+    Sheets("Known").Columns(3).ColumnWidth = 25
+    Sheets("Known").Columns(1).ColumnWidth = 25
+
+
+End Sub
+
+Sub RemoveDuplicate()
+    Sheets("Words").UsedRange.RemoveDuplicates Columns:=1, Header:=xlYes
+    Sheets("Known").UsedRange.RemoveDuplicates Columns:=1, Header:=xlYes
+End Sub
+
+Sub CopySelectRow()
+'
+' Shortcut: Ctrl - E
+          
+' Copy one row from "Words" sheet to "Known" sheet, then delete the row
+    
+    ActiveCell.EntireRow.Copy Destination:=Sheets("Known").Range("A" & Rows.Count).End(xlUp).Offset(1)
+    ActiveCell.EntireRow.Delete
+       
+End Sub
+
+Sub ListRemove()
+'
+' Shortcut : Ctrl+Shift+e
+    
+    ChangeFont
+    RemoveEmptyLines
+    RemoveDuplicate
+    
+    Application.ScreenUpdating = False
+
+
+' Look for existing lines in "Known" sheet then remove the corresponding lines
+
+    Dim matchList As Worksheet
+    Set matchList = Worksheets("Known")
+
+    Dim matchRange As Range
+    Set matchRange = matchList.Range("A1:A" & matchList.Cells(matchList.Rows.Count, 1).End(xlUp).Row)
+
+    Dim closedList As Worksheet
+    Set closedList = Worksheets("Words")
+
+    Dim searchRows As Long
+    searchRows = closedList.Cells(closedList.Rows.Count, 1).End(xlUp).Row
+
+    Dim i As Long
+    For i = searchRows To 1 Step -1
+        If Not (IsError(Application.Match(closedList.Cells(i, 1).Value, matchRange, 0))) Then
+            closedList.Cells(i, 1).EntireRow.Delete
+        End If
+    Next
+
+End Sub
+
+
+Sub CreateShortcut()
+    Application.OnKey "^w", "NihongoDera"
+    Application.OnKey "^e", "CopySelectRow"
+    Application.OnKey "^+e", "ListRemove"
+End Sub
+
+Sub DeleteShortcut()
+    Application.OnKey "^w"
+    Application.OnKey "^e"
+    Application.OnKey "^+e"
+End Sub
+
+Sub SeparateHiragana()
+    Dim words As Range, word As Range
+    
+    Set words = Sheets("Words").UsedRange
+    
+    For Each word In words.Rows
+        word.Cells(, 2).Value = Split(word.Cells(, 1).Value, " ")(0)
+        word.Cells(, 3).Value = Split(word.Cells(, 1).Value, " ")(1)
+        word.Cells(, 3).Value = Replace(word.Cells(, 3).Value, "(", "")
+        word.Cells(, 3).Value = Replace(word.Cells(, 3).Value, ")", "")
+    Next
+End Sub
+
+Sub CopyMeaning()
+    Dim SourceRange As Range
+ 
+    Set SourceRange = Sheets("Words").UsedRange
+ 
+    If SourceRange.Rows.Count >= 2 Then
+        Dim FirstCell As Range
+        Dim RowIndex As Integer
+  
+        For RowIndex = SourceRange.Rows.Count To 1 Step -2
+            Set FirstCell = SourceRange.Cells(RowIndex, 1)
+            SourceRange.Cells(RowIndex - 1, 4).Value = SourceRange.Cells(RowIndex, 1).Value
+            FirstCell.EntireRow.Delete
+        Next
+    
+     End If
+
+End Sub
+
+
+Sub NihongoDera()
+'
+' NihongoDera Macro
+'
+' Touche de raccourci du clavier: Ctrl+w
+'
+    Application.ScreenUpdating = False
+
+    Cells.ClearContents
+    ActiveSheet.PasteSpecial Format:="Texte Unicode", Link:=False, DisplayAsIcon:=False
+    
+    CopyMeaning
+    SeparateHiragana
+    Columns(1).Delete
+    
+    ListRemove
+    
+    Application.ScreenUpdating = True
+    
+    Range("A1").Select
+    Application.CutCopyMode = False
+End Sub
