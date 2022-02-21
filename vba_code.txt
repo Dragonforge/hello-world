@@ -1,7 +1,19 @@
 
 update feb 2022
+
+Modifying the ctrl-e shortcut 
+' Copy one row from "Words" sheet to "Known" sheet, then delete the row
+    If ActiveSheet.Name = "Words" Then
+        ActiveCell.EntireRow.Copy Destination:=Sheets("Known").Range("A" & Rows.Count).End(xlUp).Offset(1)
+        ActiveCell.EntireRow.Delete
+    Else
+' Or copy back the row to the "Words" sheet
+        ActiveCell.EntireRow.Copy Destination:=Sheets("Words").Range("A" & Rows.Count).End(xlUp).Offset(1)
+        ActiveCell.EntireRow.Delete
+    End If
+
 Adding "security":     Worksheets("Words").Activate
-(to avoid copy pasting on the "Known" worksheet.
+(to avoid copy pasting on the "Known" worksheet.)
 
 =================================================================================
 
