@@ -1,3 +1,10 @@
+
+update feb 2022
+Adding "security":     Worksheets("Words").Activate
+(to avoid copy pasting on the "Known" worksheet.
+
+=================================================================================
+
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
     Call Module5.DeleteShortcut
     
