@@ -1,4 +1,54 @@
 
+update 23 feb 2022
+
+adding a frequency to each word from Nihongodera
+
+Sub ShowFrequency()
+
+    Columns("C:C").Select
+    Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+    Selection.ColumnWidth = 12
+    
+    Dim matchList As Worksheet
+    Set matchList = Worksheets("Frequency")
+
+    Dim matchRange As Range
+    Set matchRange = matchList.Range("A1:A" & matchList.Cells(matchList.Rows.Count, 1).End(xlUp).Row)
+
+    Dim closedList As Worksheet
+    Set closedList = Worksheets("Words")
+
+    Dim searchRows As Long
+    searchRows = closedList.Cells(closedList.Rows.Count, 1).End(xlUp).Row
+
+    Dim i As Long
+    For i = searchRows To 1 Step -1
+        If Not (IsError(Application.Match(closedList.Cells(i, 1).Value, matchRange, 0))) Then
+            closedList.Cells(i, 3).Value = Application.Match(closedList.Cells(i, 1).Value, matchRange, 0)
+        End If
+    Next
+
+    Columns("C:C").Select
+    With Selection.Font
+        .Size = 16
+    End With
+    Selection.NumberFormat = "0"
+    Selection.ColumnWidth = 9.33
+    Selection.FormatConditions.AddAboveAverage
+    Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+    Selection.FormatConditions(1).AboveBelow = xlBelowAverage
+    With Selection.FormatConditions(1).Font
+        .Color = -11489280
+        .TintAndShade = 0
+    End With
+    Selection.FormatConditions(1).StopIfTrue = False
+
+
+End Sub
+
+
+=================================================================================
+
 update feb 2022
 
 Modifying the ctrl-e shortcut 
