@@ -1,6 +1,3 @@
 # Let's learn vocabulary!
-Vocabulary.xslm : worksheet to work with lists of vocabulary : 
-## Words (your list), 
-## Known (Words you already know)
-## Frequency Sheet 
-### (readme.docx or readme.pdf : screenshots)
+Get words from Nihongodera
+Use them to sort what you know / you don't know
